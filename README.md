@@ -1,5 +1,4 @@
-# text-mining-to-summarized-news
-
+## 뉴스 크롤링 및 
 
 # 현재 진행 상태
 
