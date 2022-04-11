@@ -105,9 +105,7 @@ all_news_df = pd.DataFrame(
 date = 20211116
 list_url_base = "https://news.naver.com/main/list.naver"
 list_url_start = f"?mode=LS2D&mid=shm&sid2=250&sid1=102&date={date}"
-headers = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36"
-}
+headers = {"User-Agent": "[chrome의 request header 넣기]"}
 
 response = requests.get(list_url_base + list_url_start, headers=headers)
 
@@ -154,11 +152,11 @@ while True:
 # )
 
 # %%
-db_connection_str = "mysql+pymysql://root:wlsghks1234*@127.0.0.1/naver_news"
+id = "[게정]"
+psw = "[비밀번호]"
+db_name = "[DB이름]"
+db_connection_str = f"mysql+pymysql://{id}:{psw}@127.0.0.1/{db_name}"
 db_connection = create_engine(db_connection_str)
 # conn = db_connection.connect()
 # conn = pymysql.connect(host='127.0.0.1',user='root',password='wlsghks1234*',db= 'testdb',charset='utf8')
 all_news_df.to_sql(name="news", con=db_connection, if_exists="replace", index=False)
-
-import kobert
-
