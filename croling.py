@@ -104,7 +104,7 @@ def get_content(news_list):
                 news_page_df = news_page_df.append(inf, ignore_index=True)
             except:
                 news_page_df = pd.DataFrame([inf])
-        time.sleep(random.randrange(1, 7))
+        time.sleep(random.randrange(1, 2))
     return news_page_df
 
 
@@ -142,8 +142,8 @@ headers = {"User-Agent": "[chrome의 request header 넣기]"}
 response = requests.get(list_url_base + list_url_start, headers=headers)
 
 # 과도한 탐색 방지용 딜레이
-### 수정/삭제 하셔도 됩니다. (ip벤 먹을 수 있음?)
-time.sleep(random.randrange(20, 30))
+### 수정/삭제 하셔도 됩니다.
+time.sleep(random.randrange(2, 3))
 
 while True:
     # 첫 페이지 탐색
@@ -181,7 +181,7 @@ while True:
     else:
         response = requests.get(list_url_base + next_page_url, headers=headers)
 
-        time.sleep(random.randrange(10, 20))
+        time.sleep(random.randrange(1, 2))
 
 
 # all_news_df.to_csv(
