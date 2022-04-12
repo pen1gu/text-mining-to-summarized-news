@@ -101,6 +101,7 @@ def get_content(news_list):
             try:
                 ## df.append 사용 금지!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 ## pd.concat 으로 바꿀것!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
                 news_page_df = news_page_df.append(inf, ignore_index=True)
             except:
                 news_page_df = pd.DataFrame([inf])
