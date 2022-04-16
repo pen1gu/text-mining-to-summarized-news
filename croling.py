@@ -9,6 +9,7 @@ import pandas as pd
 from bs4 import BeautifulSoup as bs
 import time
 import random
+import json
 from sqlalchemy import create_engine
 
 # %%
@@ -128,7 +129,7 @@ all_news_df = pd.DataFrame(
 # 검색 날짜
 ## 현재 하루단위로 검색
 ## 범위 검색에 대한 방안 찾기
-date = 20211116
+date = 20220415
 
 # 검색 url
 list_url_base = "https://news.naver.com/main/list.naver"
@@ -138,7 +139,9 @@ list_url_base = "https://news.naver.com/main/list.naver"
 ## 다른 필터에 대한 sid탐색 및 dict 변환 필요
 ### 경제 sid1 = 101
 list_url_start = f"?mode=LS2D&mid=shm&sid2=250&sid1=102&date={date}"
-headers = {"User-Agent": "[chrome의 request header 넣기]"}
+headers = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.75 Safari/537.36"
+}
 
 response = requests.get(list_url_base + list_url_start, headers=headers)
 
@@ -196,11 +199,15 @@ while True:
 # db접근 엔진 생성
 ### 기본적으로 localdb에 접근하도록 되어있음.
 ### 다른 db 접근 필요시 db_connection_str 수정
-id = "[게정]"
-psw = "[비밀번호]"
-db_name = "[DB이름]"
-db_connection_str = f"mysql+pymysql://{id}:{psw}@127.0.0.1/{db_name}"
+with open("db_info.json", "r") as f:
+    db_info = json.loads(f.read())
+
+db_id = db_info["id"]
+db_psw = db_info["psw"]
+db_name = db_info["db_name"]
+
+db_connection_str = f"mysql+pymysql://{db_id}:{db_psw}@127.0.0.1/{db_name}"
 db_connection = create_engine(db_connection_str)
 
 # 최종 Dataframe을 db에 적제
-all_news_df.to_sql(name="news", con=db_connection, if_exists="replace", index=False)
+all_news_df.to_sql(name="news", con=db_connection, if_exists="append", index=False)
