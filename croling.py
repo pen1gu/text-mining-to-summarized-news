@@ -198,7 +198,7 @@ while True:
 # %%
 # db접근 엔진 생성
 ### 기본적으로 localdb에 접근하도록 되어있음.
-### 다른 db 접근 필요시 db_connection_str 수정
+### 다른 서버 접근 필요시 db_connection_str 직접 수정
 with open("db_info.json", "r") as f:
     db_info = json.loads(f.read())
 
