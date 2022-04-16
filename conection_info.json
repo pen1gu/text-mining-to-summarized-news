@@ -1,0 +1,10 @@
+{
+    "http_request": {
+        "User-Agent": "chrome's user-agent"
+    },
+    "database": {
+        "id": "[id]",
+        "psw": "[psw]",
+        "db_name": "[db_name]"
+    }
+}

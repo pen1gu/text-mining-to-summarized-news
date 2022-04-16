@@ -12,9 +12,16 @@ import random
 import json
 from sqlalchemy import create_engine
 
+
+with open("conection_info_mylocal.json", "r") as f:
+    conection_info = json.loads(f.read())
+
+db_info = conection_info["database"]
+request_info = conection_info["http_request"]
+
 # %%
 def get_read_content(read_url):
-    response = requests.get(read_url, headers=headers)
+    response = requests.get(read_url, headers=request_info)
 
     res = bs(response.text, "html.parser")
 
@@ -139,11 +146,8 @@ list_url_base = "https://news.naver.com/main/list.naver"
 ## 다른 필터에 대한 sid탐색 및 dict 변환 필요
 ### 경제 sid1 = 101
 list_url_start = f"?mode=LS2D&mid=shm&sid2=250&sid1=102&date={date}"
-headers = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.75 Safari/537.36"
-}
 
-response = requests.get(list_url_base + list_url_start, headers=headers)
+response = requests.get(list_url_base + list_url_start, headers=request_info)
 
 # 과도한 탐색 방지용 딜레이
 ### 수정/삭제 하셔도 됩니다.
@@ -172,7 +176,9 @@ while True:
     # 첫페이지 이후 나머지 페이지 탐색
     for news_list_url in news_list_url_list:
         print("serch page...")
-        response = requests.get(list_url_base + news_list_url["href"], headers=headers)
+        response = requests.get(
+            list_url_base + news_list_url["href"], headers=request_info
+        )
         list_page = bs(response.text, "html.parser")
         news_list = list_page.find("div", {"class": "content"})
         news_list = news_list.find_all("li")
@@ -183,7 +189,7 @@ while True:
     if next_page_url is None:
         break
     else:
-        response = requests.get(list_url_base + next_page_url, headers=headers)
+        response = requests.get(list_url_base + next_page_url, headers=request_info)
 
         time.sleep(random.randrange(1, 2))
 
@@ -199,8 +205,6 @@ while True:
 # db접근 엔진 생성
 ### 기본적으로 localdb에 접근하도록 되어있음.
 ### 다른 서버 접근 필요시 db_connection_str 직접 수정
-with open("db_info.json", "r") as f:
-    db_info = json.loads(f.read())
 
 db_id = db_info["id"]
 db_psw = db_info["psw"]
@@ -210,4 +214,8 @@ db_connection_str = f"mysql+pymysql://{db_id}:{db_psw}@127.0.0.1/{db_name}"
 db_connection = create_engine(db_connection_str)
 
 # 최종 Dataframe을 db에 적제
-all_news_df.to_sql(name="news", con=db_connection, if_exists="append", index=False)
+
+# mode = "append"
+mode = "replace"
+
+all_news_df.to_sql(name="news", con=db_connection, if_exists="replace", index=False)
