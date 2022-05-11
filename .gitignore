@@ -1,7 +1,4 @@
-<<<<<<< HEAD
-conection_info_mylocal.json
-test.py
-=======
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -131,4 +128,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
->>>>>>> 90458c5a03e02790d223b6bb33c8b218ec0c5e6b
+
+# personal file
+conection_info_mylocal.json
+test.py
