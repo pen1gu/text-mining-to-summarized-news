@@ -12,6 +12,7 @@ from datetime import date, datetime,timedelta
 
 
 #TODO: 내가 필요한 naver news의 tag들 -> oid, date, page
+# stg_dev 병합 예정
 
 logging.basicConfig(level=logging.info)
 logger = logging()
