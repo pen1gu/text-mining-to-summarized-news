@@ -8,7 +8,7 @@ import time
 
 # 근데 이제 제목이랑 contents를 mapping을 하고 그 다음에 contents 요약이 필요하다.
 
-class Cralwer:
+class Crawler:
     def __init__(self):
         self.search = ""
         self.url = ""
@@ -45,6 +45,7 @@ class Cralwer:
         html = BeautifulSoup(original_html.text, "html.parser")
         time.sleep(0.01)
         # 검색결과
+        
         articles = html.select("div.group_news > ul.list_news > li div.news_area > a")
         # 검색된 기사의 갯수
         return articles
