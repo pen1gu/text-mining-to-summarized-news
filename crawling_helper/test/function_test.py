@@ -1,52 +1,109 @@
+from cmath import log
 import re
 
 import pandas as pd
 from bs4 import BeautifulSoup
 import requests
 import time
+import logging
+from company_id import it_companys
+from datetime import date, datetime,timedelta
 
 
-# 근데 이제 제목이랑 contents를 mapping을 하고 그 다음에 contents 요약이 필요하다.
+
+#TODO: 내가 필요한 naver news의 tag들 -> oid, date, page
+
+logging.basicConfig(level=logging.info)
+logger = logging()
 
 class Crawler:
     def __init__(self):
-        self.search = ""
-        self.url = ""
+        self.topic = ""
+        self.urls_info = []
         self.title = ""
 
-    def set_search_keyword(self, search):
-        # 키워드가 빠져있어야 하는 이유는 다른 메서드, 데이터 저장할 때 search가 topic이 되기 때문이다.
-        self.search = search
 
-    def selection_crawling_page(self, page):
+    # TODO: Topic을 정하면 그 분야에 있는 모든 회사거를 가져오도록 시행해보자
+    def set_search_topic(self, topic): #FIXME: 키워드가 아닌 oid, 선택 분야가 필요하다.
+        # 키워드가 빠져있어야 하는 이유는 다른 메서드, 데이터 저장할 때 search가 topic이 되기 때문이다.
+        self.topic = topic
+
+    def get_topic_url(self):
+
+        topic = self.topic
+
+        # TODO: Topic에 따른 인자를 유동적으로 수정할 수 있게 모든 Topic에 대한 정보를 넣는다.
+        
+        pass
+
+    def get_pages_count(self, url) :
+        try:
+            original_html = requests.get(url=url, headers={'User-Agent': 'Mozilla/5.0'})
+            html = BeautifulSoup(original_html.text, "html.parser")
+            time.sleep(0.01)
+        except Exception as ex:
+            logging.exception('crawling error : ')
+
+        count = int(html.select("#main_content > div.paging > strong")[0].text)
+
+        return count
+
+    # IT/과학의 분야 별로 tag를 나눠서
+    def selection_crawling_to_date(self, days = 1):
         # 사실 무조건 몇 페이지를 가져오는 것 보다는 batch 파일로 만들어서 하루에 하나 씩 그 전날에 올라온 뉴스들을 크롤링하는게 편함
         # 그러면 페이지로 크롤링하는 기능 하나, 일별로 크롤링하는 기능 하나 이렇게 2개를 만들자
-        page_num = 0
 
-        if page == 1:
-            page_num = 1
-        elif page == 0:
-            page_num = 1
-        else:
-            page_num = page + 9 * (page - 1)
+        # 몇쪽부터 몇쪽까지 할지
 
-        # url 생성
-        self.url = "https://search.naver.com/search.naver?where=news&sm=tab_pge&query=" + self.search + "&start=" + str(
-            page_num)
+        '''TODO: 회사 별로 oid 라는게 url에서 작용됨 이를 정의 필요
 
-    def 몇일동안의_뉴스를_크롤링할지(self, days):
-        # 이제 여기에 네이버 기본 필터에 저장되어있는 날짜 별 링크 제작 시스템을 만들어야한다.
-        # parameter 설명 적어야됨 이게 일정하지가 않아
-        pass
+            date는 원하는 날짜만큼 현재 날짜 - 1 에서빼서 사용. (맨 처음 한번만 할거기에)
+            page는 유동적으로 총 몇 페이지인지 구할 수 있을까?
+            임의로 최대값을 넣을 시 가장 마지막 페이지를 가리킴 -> default를 10으로 하기 (그 뒤는 X)
+            어떤 종목인지, 분야 관련주인지 무엇을 예측할건지에 대한 정의도 필요하다.
+        '''
+        #main_content > div.paging > strong
+
+        # FIXME: 나중에 선택이 가능하도록 시행 -> 현재는 "디지털 데일리" 
+        # https://news.naver.com/main/list.naver?mode=LPOD&mid=sec&oid=138&date=20220510&page=2
+
+
+        for i in range(days+1, 1, -1):
+            # current url
+            pages = self.get_pages_count("https://news.naver.com/main/list.naver?mode=LPOD&mid=sec&oid=" + \
+                str(138) + "&date=" + (datetime.now() - timedelta(days=i)).strftime("%Y%m%d") + "&page=" + str(10)       
+            )   
+
+            url = "https://news.naver.com/main/list.naver?mode=LPOD&mid=sec&oid=" + \
+            str(138) + "&date=" + (datetime.now() - timedelta(days=i)).strftime("%Y%m%d") + "&page=" + str(pages)               
+
+            self.urls_info.append(
+                {   
+                    'url':url,
+                    'page_count' : pages
+                 }
+            )
+
+    # default로 하루 동안으로 해둘거고, 맨 처음 돌릴 때 6달 돌릴 생각
+    # 분야 별로 
 
     def get_articles(self):
         # html불러오기
-        original_html = requests.get(self.url, headers={'User-Agent': 'Mozilla/5.0'})
+        urls_info = self.urls_info
+
+        for url in urls_info:
+            #TODO: url을 어떻게 불러올지 구상 필요
+            url['url']
+            pass
+
+        # 한 토픽, 한 페이지, 페이지의 기사 -> ex) 1 topic, 10 days, 3pages, 10news
+
+        original_html = requests.get(1, headers={'User-Agent': 'Mozilla/5.0'})
         html = BeautifulSoup(original_html.text, "html.parser")
         time.sleep(0.01)
         # 검색결과
         
-        articles = html.select("div.group_news > ul.list_news > li div.news_area > a")
+        articles = html.select("#section_body")
         # 검색된 기사의 갯수
         return articles
 
